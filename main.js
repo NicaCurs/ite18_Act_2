@@ -3,7 +3,7 @@ import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.152.0/exampl
 
 // Scene, Camera, Renderer
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x000000); // Black background for a more eerie atmosphere
+scene.background = new THREE.Color(0x002233); // Dark blue for underwater vibe
 
 const camera = new THREE.PerspectiveCamera(
   75,
@@ -11,87 +11,55 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100
 );
-camera.position.set(20, 10, 30);
+camera.position.set(0, 5, 30);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
 document.body.appendChild(renderer.domElement);
 
-// Ocean-like ground with added detail
-const oceanGeometry = new THREE.PlaneGeometry(100, 100);
-const oceanMaterial = new THREE.MeshStandardMaterial({
-  color: 0x001a33, // Dark ocean blue
-  roughness: 0.8,
-  metalness: 0.1,
-});
-const ocean = new THREE.Mesh(oceanGeometry, oceanMaterial);
-ocean.rotation.x = -Math.PI / 2;
-ocean.receiveShadow = true;
-scene.add(ocean);
-
-// Fog for a creepy atmosphere
-scene.fog = new THREE.Fog(0x000000, 10, 50); // Black fog that adds depth and mystery
-
-// Lighting
-const ambientLight = new THREE.AmbientLight(0x222222, 0.5); // Increased ambient light
+// Lighting - Ambient light and a glowing spotlight for atmosphere
+const ambientLight = new THREE.AmbientLight(0x444444, 0.5); // Dim ambient light for depth
 scene.add(ambientLight);
 
-const lighthouseLight = new THREE.DirectionalLight(0xffff99, 1.2); // Brighter lighthouse light glow
-lighthouseLight.position.set(0, 25, 0);
-lighthouseLight.castShadow = true;
-scene.add(lighthouseLight);
+const spotLight = new THREE.SpotLight(0x66ccff, 1.5); // Glowing light source (magical underwater)
+spotLight.position.set(0, 10, 0);
+spotLight.castShadow = true;
+scene.add(spotLight);
 
-// Lighthouse
-const lighthouseBase = new THREE.Mesh(
-  new THREE.CylinderGeometry(4, 4, 10),
-  new THREE.MeshStandardMaterial({ color: 0x555555 })
-);
-lighthouseBase.position.y = 5;
-lighthouseBase.castShadow = true;
-
-const lighthouseTower = new THREE.Mesh(
-  new THREE.CylinderGeometry(1.5, 1.5, 15),
-  new THREE.MeshStandardMaterial({ color: 0xcccccc })
-);
-lighthouseTower.position.y = 12.5;
-lighthouseTower.castShadow = true;
-
-const lighthouseLightTop = new THREE.Mesh(
-  new THREE.SphereGeometry(2, 16, 16),
-  new THREE.MeshStandardMaterial({ color: 0xffff99, emissive: 0xffff66 })
-);
-lighthouseLightTop.position.y = 22;
-lighthouseLightTop.castShadow = true;
-
-const lighthouseCollisionBox = new THREE.BoxHelper(lighthouse, 0xffff00); // Yellow collision box
-lighthouseCollisionBox.update();
-scene.add(lighthouseCollisionBox);
-
-const lighthouse = new THREE.Group();
-lighthouse.add(lighthouseBase);
-lighthouse.add(lighthouseTower);
-lighthouse.add(lighthouseLightTop);
-scene.add(lighthouse);
-
-// Glowing Sea Creatures (like jellyfish or glowing fish)
-const seaCreatures = [];
-const creatureMaterial = new THREE.MeshStandardMaterial({
-  emissive: 0x33ccff, // Bright cyan glow for sea creatures
-  emissiveIntensity: 2.0, // Increased glow intensity
+// Underwater terrain (Ocean floor)
+const floorGeometry = new THREE.PlaneGeometry(100, 100);
+const floorMaterial = new THREE.MeshStandardMaterial({
+  color: 0x003366, // Deep ocean floor color
+  roughness: 0.9,
+  metalness: 0.1,
 });
-for (let i = 0; i < 20; i++) { // Increased the number of creatures
-  const creatureGeometry = new THREE.SphereGeometry(0.7, 16, 16);
-  const creature = new THREE.Mesh(creatureGeometry, creatureMaterial);
-  creature.position.set(
-    Math.random() * 50 - 25,
-    Math.random() * 3 + 1,
-    Math.random() * 50 - 25
+const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+floor.rotation.x = -Math.PI / 2;
+floor.receiveShadow = true;
+scene.add(floor);
+
+// Glowing Jellyfish
+const jellyfishMaterial = new THREE.MeshStandardMaterial({
+  emissive: 0x66ffff, // Soft cyan glow
+  emissiveIntensity: 1.5,
+  color: 0x001a1a, // Transparent body
+});
+const jellyfishGroup = [];
+for (let i = 0; i < 8; i++) { // Multiple jellyfish
+  const jellyfish = new THREE.Mesh(
+    new THREE.SphereGeometry(0.7, 16, 16),
+    jellyfishMaterial
   );
-  creature.castShadow = true;
-  scene.add(creature);
-  seaCreatures.push({
-    creature: creature,
+  jellyfish.position.set(
+    Math.random() * 40 - 20,
+    Math.random() * 5 + 2,
+    Math.random() * 40 - 20
+  );
+  jellyfish.castShadow = true;
+  scene.add(jellyfish);
+  jellyfishGroup.push({
+    jellyfish: jellyfish,
     velocity: new THREE.Vector3(
       (Math.random() - 0.5) * 0.1,
       (Math.random() - 0.5) * 0.1,
@@ -100,39 +68,75 @@ for (let i = 0; i < 20; i++) { // Increased the number of creatures
   });
 }
 
-// Additional Spooky Elements
-
-// Haunted Trees with glowing eyes
-const treeMaterial = new THREE.MeshStandardMaterial({ color: 0x2e2e2e });
-const treeGeometry = new THREE.CylinderGeometry(0.5, 1, 5);
-for (let i = 0; i < 6; i++) { // Increased the number of trees
-  const tree = new THREE.Mesh(treeGeometry, treeMaterial);
-  tree.position.set(Math.random() * 30 - 15, 2.5, Math.random() * 30 - 15);
-  tree.castShadow = true;
-  scene.add(tree);
-
-  const glowingEyes = new THREE.Mesh(
-    new THREE.SphereGeometry(0.3, 16, 16),
-    new THREE.MeshBasicMaterial({ color: 0xff0000 })
+// Glowing Bioluminescent Fish
+const fishMaterial = new THREE.MeshStandardMaterial({
+  emissive: 0x66ccff, // Glowing blue-green fish
+  emissiveIntensity: 2.0,
+  color: 0x001a1a, // Transparent fish body
+});
+const fishGroup = [];
+for (let i = 0; i < 10; i++) { // More fish
+  const fish = new THREE.Mesh(
+    new THREE.SphereGeometry(0.5, 16, 16),
+    fishMaterial
   );
-  glowingEyes.position.set(
-    tree.position.x,
-    tree.position.y + 2.5,
-    tree.position.z
+  fish.position.set(
+    Math.random() * 50 - 25,
+    Math.random() * 5 + 2,
+    Math.random() * 50 - 25
   );
-  scene.add(glowingEyes);
+  fish.castShadow = true;
+  scene.add(fish);
+  fishGroup.push({
+    fish: fish,
+    velocity: new THREE.Vector3(
+      (Math.random() - 0.5) * 0.1,
+      (Math.random() - 0.5) * 0.1,
+      (Math.random() - 0.5) * 0.1
+    ),
+  });
 }
 
-// Creepy Floating Lanterns
-const lanternMaterial = new THREE.MeshStandardMaterial({ emissive: 0xffffcc, emissiveIntensity: 1.2 });
-for (let i = 0; i < 5; i++) { // Increased the number of lanterns
-  const lantern = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.5, 0.5, 1),
-    lanternMaterial
+// Glowing Coral Reef (static, magical effect)
+const coralMaterial = new THREE.MeshStandardMaterial({
+  emissive: 0xff33cc, // Bright pink glow for coral
+  emissiveIntensity: 2.0,
+  color: 0x00cc00, // Green coral base
+});
+const coralGroup = [];
+for (let i = 0; i < 5; i++) { // A few coral clusters
+  const coral = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.5, 0.7, 3),
+    coralMaterial
   );
-  lantern.position.set(Math.random() * 30 - 15, Math.random() * 5 + 2, Math.random() * 30 - 15);
-  lantern.castShadow = true;
-  scene.add(lantern);
+  coral.position.set(
+    Math.random() * 30 - 15,
+    0,
+    Math.random() * 30 - 15
+  );
+  coral.castShadow = true;
+  scene.add(coral);
+  coralGroup.push(coral);
+}
+
+// Add some glowing underwater plants
+const plantMaterial = new THREE.MeshStandardMaterial({
+  emissive: 0x33ff66, // Soft green glow for plants
+  emissiveIntensity: 1.5,
+  color: 0x003300, // Dark green for the plant body
+});
+for (let i = 0; i < 6; i++) { // Some underwater plants
+  const plant = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.2, 0.2, 4),
+    plantMaterial
+  );
+  plant.position.set(
+    Math.random() * 40 - 20,
+    2,
+    Math.random() * 40 - 20
+  );
+  plant.castShadow = true;
+  scene.add(plant);
 }
 
 // Camera Controls
@@ -146,23 +150,27 @@ const clock = new THREE.Clock();
 const animate = () => {
   const elapsedTime = clock.getElapsedTime();
 
-  // Update controls
-  controls.update();
-
-  // Update glowing sea creatures' movement
-  seaCreatures.forEach(({ creature, velocity }) => {
-    creature.position.add(velocity);
-    if (creature.position.y < 1 || creature.position.y > 3) velocity.y *= -1;
-    if (creature.position.x < -25 || creature.position.x > 25) velocity.x *= -1;
-    if (creature.position.z < -25 || creature.position.z > 25) velocity.z *= -1;
+  // Update jellyfish movement
+  jellyfishGroup.forEach(({ jellyfish, velocity }) => {
+    jellyfish.position.add(velocity);
+    if (jellyfish.position.y < 1 || jellyfish.position.y > 5) velocity.y *= -1;
+    if (jellyfish.position.x < -25 || jellyfish.position.x > 25) velocity.x *= -1;
+    if (jellyfish.position.z < -25 || jellyfish.position.z > 25) velocity.z *= -1;
   });
 
-  // Rotate lighthouse light effect
-  lighthouseLightTop.rotation.y += 0.01;
+  // Update fish movement
+  fishGroup.forEach(({ fish, velocity }) => {
+    fish.position.add(velocity);
+    if (fish.position.y < 1 || fish.position.y > 5) velocity.y *= -1;
+    if (fish.position.x < -25 || fish.position.x > 25) velocity.x *= -1;
+    if (fish.position.z < -25 || fish.position.z > 25) velocity.z *= -1;
+  });
 
-  // Update the lighthouse collision box
-  lighthouseCollisionBox.update();
+  // Rotate coral reefs slowly
+  coralGroup.forEach(coral => coral.rotation.y += 0.005);
 
+  // Render scene
+  controls.update();
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
 };
