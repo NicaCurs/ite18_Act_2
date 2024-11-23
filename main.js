@@ -3,7 +3,7 @@ import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.152.0/exampl
 
 // Scene, Camera, Renderer
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x0b0b0b); // Deep dark gray for a more atmospheric look
+scene.background = new THREE.Color(0x000000); // Black background for a more eerie atmosphere
 
 const camera = new THREE.PerspectiveCamera(
   75,
@@ -34,10 +34,10 @@ scene.add(ocean);
 scene.fog = new THREE.Fog(0x000000, 10, 50); // Black fog that adds depth and mystery
 
 // Lighting
-const ambientLight = new THREE.AmbientLight(0x222222, 0.4); // Low ambient light for night effect
+const ambientLight = new THREE.AmbientLight(0x222222, 0.5); // Increased ambient light
 scene.add(ambientLight);
 
-const lighthouseLight = new THREE.DirectionalLight(0xffff99, 0.8); // Brighter lighthouse light glow
+const lighthouseLight = new THREE.DirectionalLight(0xffff99, 1.2); // Brighter lighthouse light glow
 lighthouseLight.position.set(0, 25, 0);
 lighthouseLight.castShadow = true;
 scene.add(lighthouseLight);
@@ -78,9 +78,9 @@ scene.add(lighthouse);
 const seaCreatures = [];
 const creatureMaterial = new THREE.MeshStandardMaterial({
   emissive: 0x33ccff, // Bright cyan glow for sea creatures
-  emissiveIntensity: 1.5,
+  emissiveIntensity: 2.0, // Increased glow intensity
 });
-for (let i = 0; i < 12; i++) { // Increased the number of creatures
+for (let i = 0; i < 20; i++) { // Increased the number of creatures
   const creatureGeometry = new THREE.SphereGeometry(0.7, 16, 16);
   const creature = new THREE.Mesh(creatureGeometry, creatureMaterial);
   creature.position.set(
@@ -105,7 +105,7 @@ for (let i = 0; i < 12; i++) { // Increased the number of creatures
 // Haunted Trees with glowing eyes
 const treeMaterial = new THREE.MeshStandardMaterial({ color: 0x2e2e2e });
 const treeGeometry = new THREE.CylinderGeometry(0.5, 1, 5);
-for (let i = 0; i < 4; i++) {
+for (let i = 0; i < 6; i++) { // Increased the number of trees
   const tree = new THREE.Mesh(treeGeometry, treeMaterial);
   tree.position.set(Math.random() * 30 - 15, 2.5, Math.random() * 30 - 15);
   tree.castShadow = true;
@@ -124,8 +124,8 @@ for (let i = 0; i < 4; i++) {
 }
 
 // Creepy Floating Lanterns
-const lanternMaterial = new THREE.MeshStandardMaterial({ emissive: 0xffffcc, emissiveIntensity: 0.8 });
-for (let i = 0; i < 3; i++) {
+const lanternMaterial = new THREE.MeshStandardMaterial({ emissive: 0xffffcc, emissiveIntensity: 1.2 });
+for (let i = 0; i < 5; i++) { // Increased the number of lanterns
   const lantern = new THREE.Mesh(
     new THREE.CylinderGeometry(0.5, 0.5, 1),
     lanternMaterial
