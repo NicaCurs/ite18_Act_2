@@ -3,7 +3,7 @@ import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.152.0/exampl
 
 // Scene, Camera, Renderer
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x1a1a1a); // Very dark gray for a spooky night vibe
+scene.background = new THREE.Color(0x0b0b0b); // Deep dark gray for a more atmospheric look
 
 const camera = new THREE.PerspectiveCamera(
   75,
@@ -18,10 +18,10 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
 document.body.appendChild(renderer.domElement);
 
-// Ocean-like ground
+// Ocean-like ground with added detail
 const oceanGeometry = new THREE.PlaneGeometry(100, 100);
 const oceanMaterial = new THREE.MeshStandardMaterial({
-  color: 0x001a33, // Dark blue for the ocean floor
+  color: 0x001a33, // Dark ocean blue
   roughness: 0.8,
   metalness: 0.1,
 });
@@ -30,14 +30,14 @@ ocean.rotation.x = -Math.PI / 2;
 ocean.receiveShadow = true;
 scene.add(ocean);
 
-// Fog for a mysterious atmosphere
-scene.fog = new THREE.Fog(0x000000, 10, 50); // Deep black fog for a very eerie look
+// Fog for a creepy atmosphere
+scene.fog = new THREE.Fog(0x000000, 10, 50); // Black fog that adds depth and mystery
 
 // Lighting
-const ambientLight = new THREE.AmbientLight(0x222222, 0.4); // Low ambient light for night
+const ambientLight = new THREE.AmbientLight(0x222222, 0.4); // Low ambient light for night effect
 scene.add(ambientLight);
 
-const lighthouseLight = new THREE.DirectionalLight(0xeeeeff, 0.5); // Lighthouse beam light
+const lighthouseLight = new THREE.DirectionalLight(0xffff99, 0.8); // Brighter lighthouse light glow
 lighthouseLight.position.set(0, 25, 0);
 lighthouseLight.castShadow = true;
 scene.add(lighthouseLight);
@@ -64,6 +64,10 @@ const lighthouseLightTop = new THREE.Mesh(
 lighthouseLightTop.position.y = 22;
 lighthouseLightTop.castShadow = true;
 
+const lighthouseCollisionBox = new THREE.BoxHelper(lighthouse, 0xffff00); // Yellow collision box
+lighthouseCollisionBox.update();
+scene.add(lighthouseCollisionBox);
+
 const lighthouse = new THREE.Group();
 lighthouse.add(lighthouseBase);
 lighthouse.add(lighthouseTower);
@@ -72,25 +76,63 @@ scene.add(lighthouse);
 
 // Glowing Sea Creatures (like jellyfish or glowing fish)
 const seaCreatures = [];
-const creatureMaterial = new THREE.MeshStandardMaterial({ emissive: 0x33ccff, emissiveIntensity: 1.5 });
-for (let i = 0; i < 6; i++) {
+const creatureMaterial = new THREE.MeshStandardMaterial({
+  emissive: 0x33ccff, // Bright cyan glow for sea creatures
+  emissiveIntensity: 1.5,
+});
+for (let i = 0; i < 12; i++) { // Increased the number of creatures
   const creatureGeometry = new THREE.SphereGeometry(0.7, 16, 16);
   const creature = new THREE.Mesh(creatureGeometry, creatureMaterial);
   creature.position.set(
-    Math.random() * 40 - 20,
+    Math.random() * 50 - 25,
     Math.random() * 3 + 1,
-    Math.random() * 40 - 20
+    Math.random() * 50 - 25
   );
   creature.castShadow = true;
   scene.add(creature);
   seaCreatures.push({
     creature: creature,
     velocity: new THREE.Vector3(
-      (Math.random() - 0.5) * 0.05,
-      (Math.random() - 0.5) * 0.05,
-      (Math.random() - 0.5) * 0.05
+      (Math.random() - 0.5) * 0.1,
+      (Math.random() - 0.5) * 0.1,
+      (Math.random() - 0.5) * 0.1
     ),
   });
+}
+
+// Additional Spooky Elements
+
+// Haunted Trees with glowing eyes
+const treeMaterial = new THREE.MeshStandardMaterial({ color: 0x2e2e2e });
+const treeGeometry = new THREE.CylinderGeometry(0.5, 1, 5);
+for (let i = 0; i < 4; i++) {
+  const tree = new THREE.Mesh(treeGeometry, treeMaterial);
+  tree.position.set(Math.random() * 30 - 15, 2.5, Math.random() * 30 - 15);
+  tree.castShadow = true;
+  scene.add(tree);
+
+  const glowingEyes = new THREE.Mesh(
+    new THREE.SphereGeometry(0.3, 16, 16),
+    new THREE.MeshBasicMaterial({ color: 0xff0000 })
+  );
+  glowingEyes.position.set(
+    tree.position.x,
+    tree.position.y + 2.5,
+    tree.position.z
+  );
+  scene.add(glowingEyes);
+}
+
+// Creepy Floating Lanterns
+const lanternMaterial = new THREE.MeshStandardMaterial({ emissive: 0xffffcc, emissiveIntensity: 0.8 });
+for (let i = 0; i < 3; i++) {
+  const lantern = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.5, 0.5, 1),
+    lanternMaterial
+  );
+  lantern.position.set(Math.random() * 30 - 15, Math.random() * 5 + 2, Math.random() * 30 - 15);
+  lantern.castShadow = true;
+  scene.add(lantern);
 }
 
 // Camera Controls
@@ -111,12 +153,15 @@ const animate = () => {
   seaCreatures.forEach(({ creature, velocity }) => {
     creature.position.add(velocity);
     if (creature.position.y < 1 || creature.position.y > 3) velocity.y *= -1;
-    if (creature.position.x < -20 || creature.position.x > 20) velocity.x *= -1;
-    if (creature.position.z < -20 || creature.position.z > 20) velocity.z *= -1;
+    if (creature.position.x < -25 || creature.position.x > 25) velocity.x *= -1;
+    if (creature.position.z < -25 || creature.position.z > 25) velocity.z *= -1;
   });
 
   // Rotate lighthouse light effect
   lighthouseLightTop.rotation.y += 0.01;
+
+  // Update the lighthouse collision box
+  lighthouseCollisionBox.update();
 
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
@@ -130,4 +175,3 @@ window.addEventListener("resize", () => {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
-
